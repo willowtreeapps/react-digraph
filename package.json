@@ -78,6 +78,7 @@
     "precommit": "npm run lint -s",
     "prefast-test": "npm run prepublish",
     "prepublish": "npm run build",
+    "preinstall": "npm run prepublish",
     "test": "NODE_ENV=test npm run lint && npm run fast-test",
     "view-cover": "npm run cover -- --report=html && opn ./coverage/index.html"
   }
