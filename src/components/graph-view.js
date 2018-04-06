@@ -656,37 +656,30 @@ class GraphView extends Component {
       this.state.styles.text.baseString
   }
 
-  // Renders 'node.title' into node element
   renderNodeText = (d, domNode) => {
     let d3Node = d3.select(domNode);
-    let title = d.title ? d.title : ' ';
-
-    let titleText = title.length <= this.props.maxTitleChars ? title :
-      `${title.substring(0, this.props.maxTitleChars)}...`;
-
-    let lineOffset = 18;
-    let textOffset = d.type === this.props.emptyType ? -9 : 18;
+    let lineOffset = 35;
 
     d3Node.selectAll("text").remove();
 
-    let typeText = this.props.nodeTypes[d.type].typeText;
     let style = this.getTextStyle(d, this.props.selected);
-
     let el = d3Node.append('text')
-      .attr('text-anchor', 'middle')
       .attr('style', style)
-      .attr('dy', textOffset);
+      .attr('y', this.props.textModel.length > 1 ? -lineOffset * (this.props.textModel.length + 1) : 0);
 
-    el.append('tspan')
-      .attr('opacity', 0.5)
-      .text(typeText);
+    this.props.textModel.map(m => {
+      let val = d[m];
 
-    if (title) {
-      // User defined/secondary text
-      el.append('tspan').text(titleText).attr('x', 0).attr('dy', lineOffset)
+      if (val) {
+        el.append('tspan')
+          .text(val)
+          .attr('x', -lineOffset * (this.props.textModel.length - 1))
+          .attr('dy', lineOffset * (this.props.textModel.length - 1));
 
-      el.append('title').text(title);
-    }
+        el.append(m)
+          .text(val);
+      }
+    })
   }
 
   // Renders 'edges' into entities element
@@ -879,6 +872,7 @@ GraphView.propTypes = {
   zoomDelay: PropTypes.number, // ms
   zoomDur: PropTypes.number, // ms
   graphControls: PropTypes.bool,
+  textModel: PropTypes.arrayOf(PropTypes.string),
 };
 
 GraphView.defaultProps = {
@@ -900,6 +894,7 @@ GraphView.defaultProps = {
   zoomDelay: 500,
   zoomDur: 750,
   graphControls: true,
+  textModel: ['title'],
   renderEdge: (graphView, domNode, datum, index, elements ) => {
 
     // For new edges, add necessary child domNodes
